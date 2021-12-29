@@ -1,6 +1,6 @@
 FLUX_COMPONENTS?=source-controller,kustomize-controller,helm-controller
 
-all: check-env create-cluster install-flux create-source create-kustomization
+all: check-env cluster flux-system create-source create-kustomization
 
 .PHONY: check-env
 check-env:
@@ -11,45 +11,52 @@ ifndef GITHUB_TOKEN
 	$(error GITHUB_TOKEN is undefined)
 endif
 
-.PHONY: create-cluster
-create-cluster:
+.PHONY: cluster
+cluster:
 	@if ! kind get clusters | grep -q kind; then \
 		kind create cluster --config e2e/kind.yaml;\
 	fi
 
-.PHONY: install-flux
-install-flux: create-cluster
+.PHONY: flux-system
+flux-system: cluster
 	flux install --namespace flux-system --components $(FLUX_COMPONENTS)
 
-.PHONY: create-source
-create-source: check-env install-flux
-	flux create source git k8s-gitops-flux-cluster --namespace=flux-cluster --url=https://github.com/glebiller/k8s-gitops-flux-cluster.git --branch=main --username=${GITHUB_USER} --password=${GITHUB_TOKEN}
+.PHONY: flux-cluster-namespace
+flux-cluster-namespace: cluster
+	@if ! kubectl get namespaces flux-cluster --output name; then \
+	 	kubectl create namespace flux-cluster;\
+	fi
 
-.PHONY: create-kustomization
-create-kustomization: create-source
-	flux create kustomization kind --namespace=flux-cluster --source=k8s-gitops-flux-cluster --path="./kind" --prune=true --interval=24h
+.PHONY: github-credentials
+github-credentials: check-env flux-system flux-cluster-namespace
+	@echo flux create secret git github-credentials --namespace flux-cluster --url=https://github.com/ --username=$(GITHUB_USER) --password=***
+	@flux create secret git github-credentials --namespace flux-cluster --url=https://github.com/ --username=$(GITHUB_USER) --password=$(GITHUB_TOKEN)
 
-create-namespace: create-cluster
+.PHONY: flux-cluster
+flux-cluster: check-env github-credentials
+	kubectl	apply -f base/infrastructure/flux-cluster.yaml
+
+kind-namespace: cluster
 	@if ! kubectl get namespaces kind --output name; then \
 	 	kubectl create namespace kind;\
 	fi
 
-create-docker-credentials: check-env create-namespace
+create-docker-credentials: check-env kind-namespace
 	@if ! kubectl get secrets --namespace kind kind-docker-registry --output name; then \
 		kubectl create secret docker-registry kind-docker-registry --namespace=kind --docker-server=ghcr.io --docker-username=${GITHUB_USER} --docker-password=${GITHUB_TOKEN};\
 	fi
 
-create-generic-credentials: check-env create-namespace
+create-generic-credentials: check-env kind-namespace
 	@if ! kubectl get secrets --namespace kind kind-generic --output name; then \
 		kubectl create secret generic kind-generic --namespace=kind --from-literal=username=$SEA_USER --from-literal=password=$SEA_PASSWORD;\
 	fi
 
 .PHONY: reconcile
 reconcile:
-	flux reconcile source git k8s-gitops-flux-cluster
+	flux reconcile source git k8s-gitops-flux-cluster --namespace=flux-cluster
 
 .PHONY: get-nodes
-get-nodes: create-cluster
+get-nodes: cluster
 	kubectl get nodes
 
 .PHONY: delete-cluster

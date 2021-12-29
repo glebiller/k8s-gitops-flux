@@ -2,7 +2,7 @@
 apiVersion: source.toolkit.fluxcd.io/v1beta1
 kind: GitRepository
 metadata:
-  name: flux-system
+  name: flux-cluster
   namespace: flux-cluster
 spec:
   interval: 24h
@@ -10,18 +10,18 @@ spec:
     branch: main
   secretRef:
     name: github-credentials
-  url: https://github.com/glebiller/k8s-gitops-flux-system.git
+  url: https://github.com/glebiller/k8s-gitops-flux-cluster.git
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
-  name: flux-system
+  name: flux-cluster
   namespace: flux-cluster
 spec:
   interval: 24h
   sourceRef:
     kind: GitRepository
-    name: flux-system
+    name: flux-cluster
   path: ./base/
   prune: false
   validation: client
