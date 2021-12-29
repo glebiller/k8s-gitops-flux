@@ -23,11 +23,11 @@ install-flux: create-cluster
 
 .PHONY: create-source
 create-source: check-env install-flux
-	flux create source git k8s-gitops-flux-cluster --url=https://github.com/glebiller/k8s-gitops-flux-cluster.git --branch=main --username=${GITHUB_USER} --password=${GITHUB_TOKEN}
+	flux create source git k8s-gitops-flux-cluster --namespace=flux-cluster --url=https://github.com/glebiller/k8s-gitops-flux-cluster.git --branch=main --username=${GITHUB_USER} --password=${GITHUB_TOKEN}
 
 .PHONY: create-kustomization
 create-kustomization: create-source
-	flux create kustomization kind --source=k8s-gitops-flux-cluster --path="./clusters/kind" --prune=true --interval=24h
+	flux create kustomization kind --namespace=flux-cluster --source=k8s-gitops-flux-cluster --path="./kind" --prune=true --interval=24h
 
 create-namespace: create-cluster
 	@if ! kubectl get namespaces kind --output name; then \
@@ -44,8 +44,8 @@ create-generic-credentials: check-env create-namespace
 		kubectl create secret generic kind-generic --namespace=kind --from-literal=username=$SEA_USER --from-literal=password=$SEA_PASSWORD;\
 	fi
 
-.PHONY: reconcile-cluster
-reconcile-cluster:
+.PHONY: reconcile
+reconcile:
 	flux reconcile source git k8s-gitops-flux-cluster
 
 .PHONY: get-nodes
