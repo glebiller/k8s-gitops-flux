@@ -1,0 +1,13 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: GitRepository
+metadata:
+  name: k8s-gitops-flux-cluster
+  namespace: flux-cluster
+spec:
+  interval: 24h
+  ref:
+    branch: main
+  secretRef:
+    name: k8s-gitops-flux-cluster
+  url: https://github.com/glebiller/k8s-gitops-flux-cluster.git

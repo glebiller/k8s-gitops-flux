@@ -1,0 +1,23 @@
+---
+apiVersion: skaffold/v2beta17
+kind: Config
+#requires:
+  #- path: ../flux-system/
+  #- path: ../ingress-nginx/
+  #- path: ../environment/
+deploy:
+  kubeContext: kind-kind
+  kustomize:
+    paths:
+      - ./kind/
+profiles:
+  - name: lab
+    deploy:
+      kustomize:
+        paths:
+          - ./lab/
+  - name: prod
+    deploy:
+      kustomize:
+        paths:
+          - ./prod/

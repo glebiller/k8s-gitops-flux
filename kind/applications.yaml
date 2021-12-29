@@ -1,0 +1,23 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
+kind: Kustomization
+metadata:
+  name: applications
+  namespace: flux-cluster
+spec:
+  interval: 24h
+  sourceRef:
+    kind: GitRepository
+    name: k8s-gitops-flux-cluster
+  path: ./base/applications/
+  prune: true
+  validation: client
+  patches:
+    - patch: |-
+        - op: replace
+          path: /spec/path
+          value: ./deploy/kind/
+      target:
+        group: kustomize.toolkit.fluxcd.io
+        version: v1beta1
+        kind: Kustomization
