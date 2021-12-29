@@ -8,7 +8,7 @@ spec:
   interval: 24h
   sourceRef:
     kind: GitRepository
-    name: clusters
+    name: flux-cluster
   path: ./base/applications/
   prune: true
   validation: client
