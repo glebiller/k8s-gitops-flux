@@ -34,7 +34,7 @@ github-credentials: check-env flux-system flux-cluster-namespace
 
 .PHONY: flux-cluster
 flux-cluster: check-env github-credentials
-	kustomize build kind | kubectl apply -f -
+	kustomize build kind | kubectl apply --overwrite=false -f -
 
 kind-namespace: cluster
 	@if ! kubectl get namespaces kind --output name; then \
