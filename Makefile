@@ -53,7 +53,7 @@ create-generic-credentials: check-env kind-namespace
 
 .PHONY: reconcile
 reconcile:
-	flux reconcile source git k8s-gitops-flux-cluster --namespace=flux-cluster
+	flux reconcile source git flux-cluster --namespace=flux-cluster
 
 .PHONY: get-nodes
 get-nodes: cluster
