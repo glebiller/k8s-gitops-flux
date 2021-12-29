@@ -27,6 +27,6 @@ spec:
       kind: Kustomization
       metadata:
         name: podinfo
-        namespace: base
+        namespace: flux-cluster
       spec:
         path: ./deploy/overlays/dev/
