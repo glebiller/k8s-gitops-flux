@@ -55,10 +55,6 @@ create-generic-credentials: check-env kind-namespace
 reconcile:
 	flux reconcile source git flux-cluster --namespace=flux-cluster
 
-.PHONY: get-nodes
-get-nodes: cluster
-	kubectl get nodes
-
-.PHONY: delete-cluster
-delete-cluster:
+.PHONY: clean
+clean:
 	kind delete cluster
