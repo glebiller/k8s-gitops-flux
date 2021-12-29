@@ -5,4 +5,4 @@ metadata:
   name: flux-cluster
   namespace: flux-cluster
 spec:
-  path: ./kind/
+  path: ./lab/
