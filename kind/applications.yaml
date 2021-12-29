@@ -21,12 +21,12 @@ spec:
         group: kustomize.toolkit.fluxcd.io
         version: v1beta1
         kind: Kustomization
-  patchesStrategicMerge:
-    - |-
-      apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-      kind: Kustomization
-      metadata:
+    - patch: |-
+        - op: replace
+          path: /spec/path
+          value: ./deploy/overlays/dev/
+      target:
+        group: kustomize.toolkit.fluxcd.io
+        version: v1beta2
+        kind: Kustomization
         name: podinfo
-        namespace: flux-cluster
-      spec:
-        path: ./deploy/overlays/dev/
