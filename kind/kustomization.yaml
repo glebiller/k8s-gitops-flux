@@ -6,4 +6,5 @@ resources:
   - ../base/flux-cluster/
   - infrastructure.yaml
   - applications.yaml
-  - kind.yaml
+patchesStrategicMerge:
+  - flux-cluster.patch.yaml
