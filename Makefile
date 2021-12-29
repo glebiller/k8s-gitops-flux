@@ -1,6 +1,6 @@
 FLUX_COMPONENTS?=source-controller,kustomize-controller,helm-controller
 
-all: check-env cluster flux-system create-source create-kustomization
+all: check-env cluster flux-system flux-cluster
 
 .PHONY: check-env
 check-env:
@@ -34,7 +34,7 @@ github-credentials: check-env flux-system flux-cluster-namespace
 
 .PHONY: flux-cluster
 flux-cluster: check-env github-credentials
-	kubectl	apply -f base/infrastructure/flux-cluster.yaml
+	kustomize build kind | kubectl apply -f -
 
 kind-namespace: cluster
 	@if ! kubectl get namespaces kind --output name; then \

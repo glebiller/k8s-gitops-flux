@@ -8,7 +8,7 @@ spec:
   interval: 24h
   sourceRef:
     kind: GitRepository
-    name: k8s-gitops-flux-cluster
+    name: flux-cluster
   path: ./base/infrastructure/
   prune: true
   validation: client
